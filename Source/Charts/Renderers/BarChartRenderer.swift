@@ -424,7 +424,25 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
         rect.size.width = CGFloat(right - left)
         rect.size.height = CGFloat(bottom - top)
         
-        trans.rectValueToPixel(&rect, phaseY: animator.phaseY )
+        if let dataProvider = dataProvider, let barData = dataProvider.barData, barData.dataSets.count > 1 {
+            rect.size.width = rect.size.width * CGFloat(barData.dataSets.count)
+            
+            for entryIndex in 0..<barData.dataSets[0].entryCount {
+                for setIndex in 0..<barData.dataSets.count {
+                    if let entry = barData[setIndex].entryForIndex(entryIndex), entry.x == x {
+                        if let startEntry = barData[0].entryForIndex(entryIndex) {
+                            rect.origin.x = CGFloat(startEntry.x - barWidthHalf)
+                        }
+                    }
+                }
+            }
+        }
+        
+        let yMax = trans.valueForTouchPoint(CGPoint(x: viewPortHandler.contentLeft, y: viewPortHandler.contentTop)).y
+        rect.origin.y = yMax
+        rect.size.height = -yMax
+        
+        trans.rectValueToPixel(&rect, phaseY: animator.phaseY)
     }
 
     open override func drawValues(context: CGContext)
