@@ -32,8 +32,8 @@ public protocol Marker: class
     /// - Parameters:
     ///   - entry: The Entry the IMarker belongs to. This can also be any subclass of Entry, like BarEntry or CandleEntry, simply cast it at runtime.
     ///   - highlight: The highlight object contains information about the highlighted value such as it's dataset-index, the selected range or stack-index (only stacked bar entries).
-    func refreshContent(entry: ChartDataEntry, highlight: Highlight)
-    
+    func refreshContent(entry: ChartDataEntry, highlight: Highlight, data: Any?)
+        
     /// Draws the Marker on the given position on the given context
     func draw(context: CGContext, point: CGPoint)
 }

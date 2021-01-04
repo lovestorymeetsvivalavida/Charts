@@ -237,7 +237,7 @@ open class CombinedChartView: BarLineChartViewBase, CombinedChartDataProvider
             }
             
             // callbacks to update the content
-            marker.refreshContent(entry: e, highlight: highlight)
+            marker.refreshContent(entry: e, highlight: highlight, data: data)
             
             // draw the marker
             marker.draw(context: context, point: pos)

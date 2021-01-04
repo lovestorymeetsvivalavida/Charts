@@ -75,6 +75,9 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
     /// Flag that indicates if highlighting per tap (touch) is enabled
     private var _highlightPerTapEnabled = true
     
+    /// Flag that indicates if highlighting per long press is enabled
+    private var _highlightPerLongPressEnabled = false
+    
     /// If set to true, chart continues to scroll after touch up
     @objc open var dragDecelerationEnabled = true
 
@@ -349,6 +352,21 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
         return highlightPerTapEnabled
     }
     
+    /// Set this to false to prevent values from being highlighted by long press gesture.
+    /// Values can still be highlighted via drag or programmatically.
+    /// **default**: true
+    @objc open var highlightPerLongPressEnabled: Bool
+    {
+        get { return _highlightPerLongPressEnabled }
+        set { _highlightPerLongPressEnabled = newValue }
+    }
+    
+    /// `true` if values can be highlighted via long press gesture, `false` ifnot.
+    @objc open var isHighlightPerLongPressEnabled: Bool
+    {
+        return highlightPerLongPressEnabled
+    }
+    
     /// Checks if the highlight array is null, has a length of zero or if the first object is null.
     ///
     /// - Returns: `true` if there are values to highlight, `false` ifthere are no values to highlight.
@@ -528,7 +546,7 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
             guard viewPortHandler.isInBounds(x: pos.x, y: pos.y) else { continue }
 
             // callbacks to update the content
-            marker.refreshContent(entry: e, highlight: highlight)
+            marker.refreshContent(entry: e, highlight: highlight, data: nil)
             
             // draw the marker
             marker.draw(context: context, point: pos)
