@@ -42,34 +42,60 @@ class CombinedChartViewController: DemoBaseViewController {
         chartView.chartDescription.enabled = false
         
         chartView.drawBarShadowEnabled = false
-        chartView.highlightFullBarEnabled = false
+        chartView.highlightFullBarEnabled = true
         
+        chartView.doubleTapToZoomEnabled = false
+        chartView.highlightPerTapEnabled = false
+        chartView.highlightPerLongPressEnabled = true
         
         chartView.drawOrder = [DrawOrder.bar.rawValue,
                                DrawOrder.bubble.rawValue,
                                DrawOrder.candle.rawValue,
                                DrawOrder.line.rawValue,
-                               DrawOrder.scatter.rawValue]
+                               DrawOrder.scatter.rawValue
+        ]
         
-        let l = chartView.legend
-        l.wordWrapEnabled = true
-        l.horizontalAlignment = .center
-        l.verticalAlignment = .bottom
-        l.orientation = .horizontal
-        l.drawInside = false
+        let xAxis = chartView.xAxis
+        xAxis.labelPosition = .bottom
+        xAxis.axisMinimum = 0
+        xAxis.granularity = 1
+        xAxis.drawGridLinesEnabled = false
+        xAxis.drawAxisLineEnabled = false
+        xAxis.valueFormatter = self
+        
+        let marker = XYMarkerView(color: UIColor(white: 180/250, alpha: 1),
+                                  font: .systemFont(ofSize: 12),
+                                  textColor: .black,
+                                  insets: UIEdgeInsets(top: 7, left: 10, bottom: 8, right: 10),
+                                  xAxisValueFormatter: chartView.xAxis.valueFormatter!)
+        marker.chartView = chartView
+        marker.minimumSize = CGSize(width: 164, height: 40)
+        chartView.marker = marker
+        
+        let legend = chartView.legend
+        legend.wordWrapEnabled = true
+        legend.horizontalAlignment = .left
+        legend.verticalAlignment = .top
+        legend.orientation = .horizontal
+        legend.drawInside = false
+        let legendEntry0 = LegendEntry(label: "盈利")
+        legendEntry0.form = .square
+        legendEntry0.formColor = .blue
+        let legendEntry1 = LegendEntry(label: "亏损")
+        legendEntry1.form = .square
+        legendEntry1.formColor = .green
+        legend.setCustom(entries: [legendEntry0, legendEntry1])
 //        chartView.legend = l
 
         let rightAxis = chartView.rightAxis
         rightAxis.axisMinimum = 0
+        rightAxis.drawAxisLineEnabled = false
+        rightAxis.drawLabelsEnabled = false
+        
         
         let leftAxis = chartView.leftAxis
         leftAxis.axisMinimum = 0
-        
-        let xAxis = chartView.xAxis
-        xAxis.labelPosition = .bothSided
-        xAxis.axisMinimum = 0
-        xAxis.granularity = 1
-        xAxis.valueFormatter = self
+        leftAxis.drawAxisLineEnabled = false
         
         self.updateChartData()
     }
@@ -85,13 +111,15 @@ class CombinedChartViewController: DemoBaseViewController {
     
     func setChartData() {
         let data = CombinedChartData()
+        data.xLabelAlias = "时间"
         data.lineData = generateLineData()
+        data.lineData.isHighlightEnabled = false
         data.barData = generateBarData()
-        data.bubbleData = generateBubbleData()
-        data.scatterData = generateScatterData()
-        data.candleData = generateCandleData()
+//        data.bubbleData = generateBubbleData()
+//        data.scatterData = generateScatterData()
+//        data.candleData = generateCandleData()
         
-        chartView.xAxis.axisMaximum = data.xMax + 0.25
+        chartView.xAxis.axisMaximum = data.xMax + 0.5
         
         chartView.data = data
     }
@@ -142,18 +170,17 @@ class CombinedChartViewController: DemoBaseViewController {
         set.drawValuesEnabled = true
         set.valueFont = .systemFont(ofSize: 10)
         set.valueTextColor = UIColor(red: 240/255, green: 238/255, blue: 70/255, alpha: 1)
-        
         set.axisDependency = .left
         
         return LineChartData(dataSet: set)
     }
     
     func generateBarData() -> BarChartData {
-        let entries1 = (0..<ITEM_COUNT).map { _ -> BarChartDataEntry in
-            return BarChartDataEntry(x: 0, y: Double(arc4random_uniform(25) + 25))
+        let entries1 = (0..<ITEM_COUNT).map { (i) -> BarChartDataEntry in
+            return BarChartDataEntry(x: Double(i), y: Double(arc4random_uniform(25) + 25))
         }
-        let entries2 = (0..<ITEM_COUNT).map { _ -> BarChartDataEntry in
-            return BarChartDataEntry(x: 0, yValues: [Double(arc4random_uniform(13) + 12), Double(arc4random_uniform(13) + 12)])
+        let entries2 = (0..<ITEM_COUNT).map { (i) -> BarChartDataEntry in
+            return BarChartDataEntry(x: Double(i), yValues: [Double(arc4random_uniform(13) + 12)])
         }
         
         let set1 = BarChartDataSet(entries: entries1, label: "Bar 1")
@@ -161,15 +188,14 @@ class CombinedChartViewController: DemoBaseViewController {
         set1.valueTextColor = UIColor(red: 60/255, green: 220/255, blue: 78/255, alpha: 1)
         set1.valueFont = .systemFont(ofSize: 10)
         set1.axisDependency = .left
+        set1.form = .circle
         
-        let set2 = BarChartDataSet(entries: entries2, label: "")
-        set2.stackLabels = ["Stack 1", "Stack 2"]
-        set2.colors = [UIColor(red: 61/255, green: 165/255, blue: 255/255, alpha: 1),
-                       UIColor(red: 23/255, green: 197/255, blue: 255/255, alpha: 1)
-        ]
+        let set2 = BarChartDataSet(entries: entries2, label: "Bar 2")
+        set2.setColor(UIColor(red: 61/255, green: 165/255, blue: 255/255, alpha: 1))
         set2.valueTextColor = UIColor(red: 61/255, green: 165/255, blue: 255/255, alpha: 1)
         set2.valueFont = .systemFont(ofSize: 10)
         set2.axisDependency = .left
+        set2.form = .square
         
         let groupSpace = 0.06
         let barSpace = 0.02 // x2 dataset
