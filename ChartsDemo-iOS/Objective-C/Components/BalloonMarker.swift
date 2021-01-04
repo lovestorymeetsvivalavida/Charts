@@ -23,11 +23,11 @@ open class BalloonMarker: MarkerImage
     @objc open var textColor: UIColor
     @objc open var insets: UIEdgeInsets
     @objc open var minimumSize = CGSize()
-    
-    fileprivate var label: String?
-    fileprivate var _labelSize: CGSize = CGSize()
-    fileprivate var _paragraphStyle: NSMutableParagraphStyle?
-    fileprivate var _drawAttributes = [NSAttributedString.Key : Any]()
+
+    open var label: String?
+    open var labelSize: CGSize = CGSize()
+    open var paragraphStyle: NSMutableParagraphStyle?
+    open var drawAttributes = [NSAttributedString.Key : Any]()
     
     @objc public init(color: UIColor, font: UIFont, textColor: UIColor, insets: UIEdgeInsets)
     {
@@ -36,8 +36,9 @@ open class BalloonMarker: MarkerImage
         self.textColor = textColor
         self.insets = insets
         
-        _paragraphStyle = NSParagraphStyle.default.mutableCopy() as? NSMutableParagraphStyle
-        _paragraphStyle?.alignment = .center
+        paragraphStyle = NSParagraphStyle.default.mutableCopy() as? NSMutableParagraphStyle
+        paragraphStyle?.alignment = .center
+        
         super.init()
     }
     
@@ -176,14 +177,14 @@ open class BalloonMarker: MarkerImage
         
         UIGraphicsPushContext(context)
         
-        label.draw(in: rect, withAttributes: _drawAttributes)
+        label.draw(in: rect, withAttributes: drawAttributes)
         
         UIGraphicsPopContext()
         
         context.restoreGState()
     }
     
-    open override func refreshContent(entry: ChartDataEntry, highlight: Highlight)
+    open override func refreshContent(entry: ChartDataEntry, highlight: Highlight, data: Any? = nil)
     {
         setLabel(String(entry.y))
     }
@@ -192,16 +193,16 @@ open class BalloonMarker: MarkerImage
     {
         label = newLabel
         
-        _drawAttributes.removeAll()
-        _drawAttributes[.font] = self.font
-        _drawAttributes[.paragraphStyle] = _paragraphStyle
-        _drawAttributes[.foregroundColor] = self.textColor
+        drawAttributes.removeAll()
+        drawAttributes[.font] = self.font
+        drawAttributes[.paragraphStyle] = paragraphStyle
+        drawAttributes[.foregroundColor] = self.textColor
         
-        _labelSize = label?.size(withAttributes: _drawAttributes) ?? CGSize.zero
+        labelSize = label?.size(withAttributes: drawAttributes) ?? CGSize.zero
         
         var size = CGSize()
-        size.width = _labelSize.width + self.insets.left + self.insets.right
-        size.height = _labelSize.height + self.insets.top + self.insets.bottom
+        size.width = labelSize.width + self.insets.left + self.insets.right
+        size.height = labelSize.height + self.insets.top + self.insets.bottom
         size.width = max(minimumSize.width, size.width)
         size.height = max(minimumSize.height, size.height)
         self.size = size

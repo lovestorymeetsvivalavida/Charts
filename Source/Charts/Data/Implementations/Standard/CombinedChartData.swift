@@ -13,6 +13,8 @@ import Foundation
 
 open class CombinedChartData: BarLineScatterCandleBubbleChartData
 {
+    public var xLabelAlias: String = "x"
+    
     private var _lineData: LineChartData!
     private var _barData: BarChartData!
     private var _scatterData: ScatterChartData!
