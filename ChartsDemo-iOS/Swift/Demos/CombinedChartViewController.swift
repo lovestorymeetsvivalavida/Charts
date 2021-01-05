@@ -46,6 +46,7 @@ class CombinedChartViewController: DemoBaseViewController {
         
         chartView.doubleTapToZoomEnabled = false
         chartView.highlightPerTapEnabled = false
+        chartView.highlightPerDragEnabled = false
         chartView.highlightPerLongPressEnabled = true
         
         chartView.drawOrder = [DrawOrder.bar.rawValue,
